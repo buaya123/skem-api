@@ -244,6 +244,10 @@ app.post('/api/deleteTarget', (req, res) => {
   })  
 })
 
+app.get('/', (req, res) => {
+  res.send("Welcome to the skem-api end-point")
+})
+
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
 })
