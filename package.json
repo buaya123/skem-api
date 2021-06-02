@@ -2,11 +2,11 @@
   "name": "vuforianodejs",
   "version": "1.0.0",
   "description": "",
-  "main": "routes.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node routes.js",
-    "serve": "nodemon routes.js"
+    "start": "node index.js",
+    "serve": "nodemon index.js"
   },
   "author": "",
   "license": "ISC",
