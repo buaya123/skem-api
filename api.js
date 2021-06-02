@@ -10,6 +10,8 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.json({limit:'50mb'}));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true, parameterLimit: 50000 }));
 
+
+
 var client = vuforia.client({
   // Server access key (used for Vuforia Web Services API)
   'serverAccessKey': 'defbfad4fcd891c153105f6279e45023e21c9fe6',

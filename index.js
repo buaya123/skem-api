@@ -3,6 +3,12 @@ const app = express()
 const port = 3000
 const api = require('./api.js')
 
+// enabling CORS to accept from all origins
+app.all('*', (req, res, next) => {
+    console.log(`${new Date()} - request for ${req.path}`);
+    res.set('Access-Control-Allow-Origin', '*');
+    next();
+});
 
 app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`)
