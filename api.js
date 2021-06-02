@@ -7,7 +7,6 @@ const port = 3000
 
 const bodyParser = require('body-parser');
 
-
 app.use(bodyParser.json({limit:'50mb'}));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true, parameterLimit: 50000 }));
 
@@ -26,8 +25,7 @@ var client = vuforia.client({
 });
 
 
-
-app.post('/api/createTarget', (req, res) => {
+const createTarget = (req, res) => {
   /* 
     req.body.name
     req.body.width
@@ -89,9 +87,9 @@ app.post('/api/createTarget', (req, res) => {
     }
     */
     })
-})     
+}    
 
-app.get('/api/getAllTargets', (req, res) => {
+const getAllTargets = (req, res) => {
   client.listTargets(function (error, result) {
  
     if (error) return res.status(400).json(result);
@@ -118,9 +116,9 @@ app.get('/api/getAllTargets', (req, res) => {
     */
     
   })             
-})  
+}
 
-app.post('/api/getOneTarget', (req, res) => {
+const getOneTarget = (req, res) => {
   const oneTarget = req.body.target
 
   client.retrieveTarget(oneTarget, function (error, result) {
@@ -156,9 +154,9 @@ app.post('/api/getOneTarget', (req, res) => {
     */
     
   })        
-}) 
+} 
 
-app.post('/api/updateTarget', (req, res) => {
+const updateTarget = (req, res) => {
   /* 
     req.body.name
     req.body.width
@@ -215,13 +213,13 @@ app.post('/api/updateTarget', (req, res) => {
       */
     
   })
-}) 
+}
 
-app.post('/api/deleteTarget', (req, res) => {
+const deleteTarget = (req, res) => {
   const oneTarget = req.body.target
 
   client.deleteTarget(oneTarget, function (error, result) {
- 
+
     if (error) return res.status(400).json(result)
  
         /*
@@ -242,12 +240,12 @@ app.post('/api/deleteTarget', (req, res) => {
       }
       */
   })  
-})
+}
 
-app.get('/', (req, res) => {
-  res.send("Welcome to the skem-api end-point")
-})
-
-app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`)
-})
+module.exports ={
+  createTarget,
+  getAllTargets,
+  getOneTarget,
+  updateTarget,
+  deleteTarget
+}
