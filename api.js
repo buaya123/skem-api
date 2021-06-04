@@ -74,18 +74,27 @@ const createTarget = (req, res) => {
      'application_metadata': util.encodeBase64(req.body.meta || "'app_name':'skem'")
   }
 
+  mongoS.connect((err, db) => {
+    if(err) return res.status(400).json("Error in Mongo connect");
+    
+    
+  
+
   client.addTarget(target, function (error, result) {
  
     //if error
-    
-    if(error) return res.status(400).json("There is an error in addTarget");
+    if(error) return res.status(400).json("There is an error in adding a Target");
 
-    
-    
-
-
-    
+    //initializing variables
+    dbo = db.db("mydb");
+    var myobj = { Target_ID: result.target_id, img_name: name, image: image, author: author, date_mod: dateTime.format(now, 'ddd, MMM DD YYYY')};
+  
+    dbo.collection("customers").insertOne(myobj, (err, result_mongo) => {
+      //if err
+      if(err) return res.status(400).json("There is an error in inserting to DB");
+      res.status(200).json(result_mongo)
     })
+})
 
     
     /*
@@ -106,7 +115,7 @@ const createTarget = (req, res) => {
       transaction_id: 'xf157g63179641c4920728f1650d1626'
     }
     */
-    
+  })
 }    
 
 const getAllTargets = (req, res) => {
@@ -142,19 +151,6 @@ const getOneTarget = (req, res) => {
   //console.log(req.body.target)
   const oneTarget = req.body.target
 
-  mongoS.connect((err, db) => {
-    if(err) return res.status(400).json("Error in Mongo connect");
-    if(err) throw err
-    dbo = db.db("mydb");
-  
-
-  //var myobj = { Target_ID: result.target_id, img_name: name, image: image, author: author, date_mod: dateTime.format(now, 'ddd, MMM DD YYYY')};
-  var myobj = { Target_ID: "adadadada", img_name: "name", image: "image", author: "author", date_mod: dateTime.format(now, 'ddd, MMM DD YYYY')};
-    
-  dbo.collection("customers").insertOne(myobj, (err, result_mongo) => {
-    if(err) return res.status(400).json("There is an error in inserting to DB");
-    res.status(200).json(result_mongo)
-  })
 
   client.retrieveTarget(oneTarget, function (error, result) {
  
@@ -189,7 +185,6 @@ const getOneTarget = (req, res) => {
     */
     
   })      
-})  
 } 
 
 const updateTarget = (req, res) => {
