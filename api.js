@@ -4,15 +4,15 @@ var util = vuforia.util();
 const express = require('express')
 const app = express()
 const port = 3000
+const bodyParser = require('body-parser');
 
 // const MongoClient = require('mongodb').MongoClient;
 // const uri = "mongodb+srv://admin:admin@cluster0.utrfo.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
 // const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
-const bodyParser = require('body-parser');
 
-app.use(bodyParser.json({limit:'50mb'}));
-app.use(bodyParser.urlencoded({ limit: "50mb", extended: true, parameterLimit: 50000 }));
+app.use(express.json({limit:'50mb'}));
+app.use(express.urlencoded({ limit: "50mb", extended: true, parameterLimit: 50000 }));
 
 
 var client = vuforia.client({
@@ -130,6 +130,7 @@ const getAllTargets = (req, res) => {
 }
 
 const getOneTarget = (req, res) => {
+  //console.log(req.body.target)
   const oneTarget = req.body.target
 
   client.retrieveTarget(oneTarget, function (error, result) {

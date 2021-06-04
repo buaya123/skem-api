@@ -3,6 +3,9 @@ const app = express()
 const port = 3000
 const api = require('./api.js')
 
+app.use(express.json({limit:'50mb'}));
+app.use(express.urlencoded({ limit: "50mb", extended: true, parameterLimit: 50000 }));
+
 // enabling CORS to accept from all origins
 app.all('*', (req, res, next) => {
     console.log(`${new Date()} - request for ${req.path}`);
