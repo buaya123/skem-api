@@ -7,9 +7,9 @@ const port = 3000
 const bodyParser = require('body-parser');
 const dateTime = require('date-and-time')
 
- const MongoClient = require('mongodb').MongoClient;
- const uri = "mongodb+srv://Admin:Admin123@cluster0.utrfo.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
- const mongoS = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+const MongoClient = require('mongodb').MongoClient;
+const uri = "mongodb+srv://Admin:Admin123@cluster0.utrfo.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
+const mongoS = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
 
 app.use(express.json({limit:'50mb'}));
@@ -31,11 +31,7 @@ var client = vuforia.client({
   'clientSecretKey': '608c6d7e77bf9efc0673ffbc21c0b611d0810722'
 });
 
-mongoS.connect((err, db) => {
-  //if(err) return res.status(400).json("Error in Mongo connect");
-  if(err) throw err
-  global.dbo = db.db("mydb");
-})
+
 
   
 const createTarget = (req, res) => {
@@ -146,6 +142,12 @@ const getOneTarget = (req, res) => {
   //console.log(req.body.target)
   const oneTarget = req.body.target
 
+  mongoS.connect((err, db) => {
+    if(err) return res.status(400).json("Error in Mongo connect");
+    if(err) throw err
+    dbo = db.db("mydb");
+  
+
   //var myobj = { Target_ID: result.target_id, img_name: name, image: image, author: author, date_mod: dateTime.format(now, 'ddd, MMM DD YYYY')};
   var myobj = { Target_ID: "adadadada", img_name: "name", image: "image", author: "author", date_mod: dateTime.format(now, 'ddd, MMM DD YYYY')};
     
@@ -186,7 +188,8 @@ const getOneTarget = (req, res) => {
     }
     */
     
-  })        
+  })      
+})  
 } 
 
 const updateTarget = (req, res) => {
