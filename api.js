@@ -140,16 +140,16 @@ const getAllTargets = (req, res) => {
   })             
 }
 
-const getOneTarget = (req, res) => {
+const getOneTarget = (req, response) => {
   //console.log(req.body.target)
   const oneTarget = req.body.target
 
   //var myobj = { Target_ID: result.target_id, img_name: name, image: image, author: author, date_mod: dateTime.format(now, 'ddd, MMM DD YYYY')};
   var myobj = { Target_ID: "adadadada", img_name: "name", image: "image", author: "author", date_mod: dateTime.format(now, 'ddd, MMM DD YYYY')};
     
-  dbo.collection("customers").insertOne(myobj, function(err, result_mongo) {
-    if(err) return res.status(400).json("There is an error in inserting to DB");
-    res.status(200).json(result_mongo)
+  dbo.collection("customers").insertOne(myobj, (err, result_mongo) => {
+    if(err) return response.status(400).json("There is an error in inserting to DB");
+    response.status(200).json(result_mongo)
   })
 
   client.retrieveTarget(oneTarget, function (error, result) {
@@ -165,7 +165,7 @@ const getOneTarget = (req, res) => {
     */
  
     	
-    res.status(200).json(result)
+    response.status(200).json(result)
  
     /*
     example of result from the vws API:
