@@ -31,7 +31,8 @@ var client = vuforia.client({
 });
 
 mongoS.connect((err, db) => {
-  if(err) return res.status(400).json("Error in Mongo connect");
+  //if(err) return res.status(400).json("Error in Mongo connect");
+  if(err) throw err
   global.dbo = db.db("mydb");
 })
 
@@ -140,7 +141,7 @@ const getAllTargets = (req, res) => {
   })             
 }
 
-const getOneTarget = (req, response) => {
+const getOneTarget = (req, res) => {
   //console.log(req.body.target)
   const oneTarget = req.body.target
 
@@ -148,8 +149,8 @@ const getOneTarget = (req, response) => {
   var myobj = { Target_ID: "adadadada", img_name: "name", image: "image", author: "author", date_mod: dateTime.format(now, 'ddd, MMM DD YYYY')};
     
   dbo.collection("customers").insertOne(myobj, (err, result_mongo) => {
-    if(err) return response.status(400).json("There is an error in inserting to DB");
-    response.status(200).json(result_mongo)
+    if(err) return res.status(400).json("There is an error in inserting to DB");
+    res.status(200).json(result_mongo)
   })
 
   client.retrieveTarget(oneTarget, function (error, result) {
@@ -165,7 +166,7 @@ const getOneTarget = (req, response) => {
     */
  
     	
-    response.status(200).json(result)
+    res.status(200).json(result)
  
     /*
     example of result from the vws API:
