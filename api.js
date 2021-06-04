@@ -78,12 +78,13 @@ const createTarget = (req, res) => {
     if(error) return res.status(400).json(result);
 
     mongoS.connect((err, db) => {
-      if (err) throw err;
+      if(error) return res.status(400).json("There is an error in connect");
         var dbo = db.db("mydb");
         var myobj = { Target_ID: result.target_id, img_name: name, image: image, author: author, date_mod: dateTime.format(now, 'ddd, MMM DD YYYY')};
         dbo.collection("customers").insertOne(myobj, function(err, res) {
-      if (err) throw err;
+        if(error) return res.status(400).json("There is an error in the DB");
         console.log("1 document inserted");
+        res.status(200).json(result)
       });
     });
     /*
@@ -95,8 +96,7 @@ const createTarget = (req, res) => {
     */
    
  
-    //if successful
-    res.status(200).json(result)
+    //if successfu
     /*
     example of result from the vws API:
     {
