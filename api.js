@@ -5,10 +5,11 @@ const express = require('express')
 const app = express()
 const port = 3000
 const bodyParser = require('body-parser');
+const dateTime = require('date-and-time')
 
-// const MongoClient = require('mongodb').MongoClient;
-// const uri = "mongodb+srv://admin:admin@cluster0.utrfo.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
-// const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+ const MongoClient = require('mongodb').MongoClient;
+ const uri = "mongodb+srv://Admin:Admin123@cluster0.utrfo.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
+ const mongoS = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
 
 app.use(express.json({limit:'50mb'}));
@@ -39,11 +40,6 @@ const createTarget = (req, res) => {
     req.body.metaData
   */
 
-    // client.connect(err => {
-    //   const collection = client.db("test").collection("devices");
-    //   // perform actions on the collection object
-    //   client.close();
-    // });
 
   var errors = []
   var flag=0
@@ -57,6 +53,8 @@ const createTarget = (req, res) => {
   var name = req.body.name
   var width = req.body.width
   var image = req.body.image
+  var author = req.body.author
+  const now = new Date();
 
   var target = {
  
@@ -78,6 +76,17 @@ const createTarget = (req, res) => {
  
     //if error
     if(error) return res.status(400).json(result);
+
+    mongoS.connect((err, db) => {
+      if(error) return res.status(400).json("There is an error in connect");
+        var dbo = db.db("mydb");
+        var myobj = { Target_ID: result.target_id, img_name: name, image: image, author: author, date_mod: dateTime.format(now, 'ddd, MMM DD YYYY')};
+        dbo.collection("customers").insertOne(myobj, function(err, res) {
+        if(error) return res.status(400).json("There is an error in the DB");
+        console.log("1 document inserted");
+      });
+    });
+    res.status(200).json(result)
     /*
     example of result from the vws API:
     {
@@ -87,8 +96,7 @@ const createTarget = (req, res) => {
     */
    
  
-    //if successful
-    res.status(200).json(result)
+    //if successfu
     /*
     example of result from the vws API:
     {
@@ -102,7 +110,7 @@ const createTarget = (req, res) => {
 
 const getAllTargets = (req, res) => {
   client.listTargets(function (error, result) {
- 
+
     if (error) return res.status(400).json(result);
     /*
     example of result from the vws API:
