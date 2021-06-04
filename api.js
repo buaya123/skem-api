@@ -84,9 +84,9 @@ const createTarget = (req, res) => {
         dbo.collection("customers").insertOne(myobj, function(err, res) {
         if(error) return res.status(400).json("There is an error in the DB");
         console.log("1 document inserted");
-        res.status(200).json(result)
       });
     });
+    res.status(200).json(result)
     /*
     example of result from the vws API:
     {
