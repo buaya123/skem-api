@@ -31,26 +31,24 @@ var client = vuforia.client({
   'clientSecretKey': '608c6d7e77bf9efc0673ffbc21c0b611d0810722'
 });
 
-
-
   
 const createTarget = (req, res) => {
-  /* 
-    req.body.name
-    req.body.width
-    req.body.image
-    req.body.active_flag
-    req.body.metaData
-  */
 
+  //initializing variables
   var errors = []
+  var returnObj = {
+    status:1,
+    message:""
+  }
   var flag=0
+  var regexp = /^[a-zA-Z0-9-_]+$/;
 
-  if(typeof req.body.name === 'object' || typeof req.body.name === 'undefined' || req.body.name.length < 3) {errors.push("Name is invalid"); flag = 1}
-  if(typeof req.body.width === 'object' || typeof req.body.width === 'undefined' || typeof req.body.width === 'number') {errors.push("Width is invalid"); flag=1}
-  if(typeof req.body.image === 'object' || typeof req.body.image === 'undefined' ) {errors.push("Image is invalid"); flag = 1}
-
-  if(flag == 1) return res.status(400).json(errors)
+  if(regexp.test(req.body.name) == false && req.body.name.length < 3) {errors.push("Name is invalid"); flag = 1}
+  if(isNaN(req.body.width)) {errors.push("Width is invalid"); flag=1}
+  if(typeof req.body.image != "string") {errors.push("Image is invalid"); flag = 1}
+  
+  returnObj.message = errors
+  if(flag == 1) return res.status(400).json(returnObj)
 
   var name = req.body.name
   var width = req.body.width
@@ -64,151 +62,107 @@ const createTarget = (req, res) => {
     'name': name,
     // width of the target in scene unit
     'width': parseFloat(width),
-    
     // the base64 encoded binary recognition image data
-    //'image': util.encodeFileBase64(__dirname + '/ship.jpg'),
     'image':image,
     // indicates whether or not the target is active for query
      'active_flag': true,
 
      'application_metadata': util.encodeBase64(req.body.meta || "'app_name':'skem'")
   }
+  //initialize status to 2
+  returnObj.status = 2
 
+  //connection start mongodb
   mongoS.connect((err, db) => {
-    if(err) return res.status(400).json("Error in Mongo connect");
-    
-    
-  
+    returnObj.message = "Error in Mongo connect"
+    if(err) return res.status(400).json(returnObj);
 
-  client.addTarget(target, function (error, result) {
- 
-    //if error
-    if(error) return res.status(400).json("There is an error in adding a Target");
-
-    //initializing variables
-    dbo = db.db("mydb");
-    var myobj = { Target_ID: result.target_id, img_name: name, image: image, author: author, date_mod: dateTime.format(now, 'ddd, MMM DD YYYY')};
+    //connection start vuforia
+    client.addTarget(target, function (error, result) {
   
-    dbo.collection("customers").insertOne(myobj, (err, result_mongo) => {
-      //if err
-      if(err) return res.status(400).json("There is an error in inserting to DB");
-      res.status(200).json(result_mongo)
+      //if error
+      returnObj.message ="There is an error in adding a Target to Vuforia"
+      if(error) return res.status(400).json(returnObj);
+
+      //initializing variables
+      dbo = db.db("mydb");
+      var myobj = { Target_ID: result.target_id, img_name: name, image: image, author: author, date_mod: dateTime.format(now, 'ddd, MMM DD YYYY')};
+    
+      dbo.collection("customers").insertOne(myobj, (err, result_mongo) => {
+        //if err
+        returnObj.message ="There is an error in inserting to mongoDB"
+        if(err) return res.status(400).json(returnObj);
+        
+
+        returnObj.status = 0
+        returnObj.message = "Successfully inserted in database"
+        res.status(200).json(returnObj)
+      })
     })
-})
 
-    
-    /*
-    example of result from the vws API:
-    {
-      result_code: 'AuthenticationFailure',
-      transaction_id: '58b51ddc7a2c4ac58d405027acf5f99a'
-    }
-    */
-   
- 
-    //if successfu
-    /*
-    example of result from the vws API:
-    {
-      target_id: '93fd6681f1r74b76bg80tf736a11b6a9',
-      result_code: 'TargetCreated',
-      transaction_id: 'xf157g63179641c4920728f1650d1626'
-    }
-    */
   })
 }    
 
 const getAllTargets = (req, res) => {
+
+  var returnObj ={
+    status:1,
+    message:"There was an error connecting to vuforia"
+  }
+
+  //connecting to vuforia
   client.listTargets(function (error, result) {
 
-    if (error) return res.status(400).json(result);
-    /*
-    example of result from the vws API:
-    {
-      result_code: 'AuthenticationFailure',
-      transaction_id: '58b51ddc7a2c4ac58d405027acf5f99a'
-    }
-    */
- 
-    res.status(200).json(result)
-
-    /*
-    example of result from the vws API:
-    {
-        “result_code”:”Success”,
-        “transaction_id”:”550e8400e29440000b41d4a716446655”,
-        “results”:[
-            ”00550e84e29b41d4a71644665555678”,
-            ”578fe7fd60055a5a84c2d215066b7a9d”
-        ]
-    }
-    */
+    if (error) return res.status(400).json(returnObj);
     
+    returnObj.status = 0
+    returnObj.message = result
+    res.status(200).json(returnObj)
+
   })             
 }
 
 const getOneTarget = (req, res) => {
   //console.log(req.body.target)
-  const oneTarget = req.body.target
+  var returnObj = {
+    status: 1,
+    message: "Invalid Target Id"
+  }
 
+  const oneTarget = req.body.target
 
   client.retrieveTarget(oneTarget, function (error, result) {
  
-    if (error) return res.status(500).json(result);
+    if (error) return res.status(500).json(returnObj);
  
-    /*
-    example of result from the vws API:
-    {
-      result_code: 'AuthenticationFailure',
-      transaction_id: '58b51ddc7a2c4ac58d405027acf5f99a'
-    }
-    */
+    returnObj.status = 0
+    returnObj.message = result
+    res.status(200).json(returnObj)
  
-    	
-    res.status(200).json(result)
- 
-    /*
-    example of result from the vws API:
-    {
-        “result_code”:”Success”,
-        “transaction_id”:”e29b41550e8400d4a716446655440000”,
-        “target_record”:{
-            “target_id”:”550b41d4a7164466554e8400e2949364”,
-            “active_flag”:true,
-            “name”:”tarmac”,
-            “width”:100.0,
-            “tracking_rating”:4,
-            “reco_rating”:””
-        },
-        “status”:”Success”
-    }
-    */
-    
   })      
 } 
 
 const updateTarget = (req, res) => {
-  /* 
-    req.body.name
-    req.body.width
-    req.body.image
-    req.body.target
-    req.body.active_flag
-    req.body.metaData
-  */
 
-  var errors = []
-  var flag=0
+    var errors = []
+    var returnObj = {
+      status:1,
+      message:""
+    }
+    var flag=0
+    var regexp = /^[a-zA-Z0-9-_]+$/;
 
-  if(typeof req.body.name === 'object' || typeof req.body.name === 'undefined' ) {errors.push("Name is invalid"); flag = 1}
-  if(typeof req.body.width === 'object' || typeof req.body.width === 'undefined' || typeof req.body.width === 'number') {errors.push("Width is invalid"); flag=1}
-  if(typeof req.body.image === 'object' || typeof req.body.image === 'undefined' ) {errors.push("Image is invalid"); flag = 1}
-
+  if(regexp.test(req.body.name) == false && req.body.name.length < 3) {errors.push("Name is invalid"); flag = 1}
+  if(isNaN(req.body.width)) {errors.push("Width is invalid"); flag=1}
+  if(typeof req.body.image != "string") {errors.push("Image is invalid"); flag = 1}
+  
+  returnObj.message = errors
   if(flag == 1) return res.status(500).json(errors)
 
   var name = req.body.name
   var width = req.body.width
   var image = req.body.image
+  var author = req.body.author
 
   const oneTarget = req.body.target
 
@@ -216,32 +170,19 @@ const updateTarget = (req, res) => {
     'name': name,
     'width': parseFloat(width),
     'image': image,
-    'active_flag' : req.body.active_flag,
+    'active_flag' : true,
     'application_metadata' : util.encodeBase64(req.body.metaData || "'app_name':'skem'")
   };
  
   client.updateTarget(oneTarget, update, function (error, result) {
+    resultObj.status = 2
+    resultObj.message = "Invalid target_ID"
+
+    if (error) return res.status(400).json(resultObj)
  
-    if (error) return res.status(400).json(result)
- 
-    /*
-    example of result from the vws API:
-    {
-      result_code: 'AuthenticationFailure',
-      transaction_id: '58b51ddc7a2c4ac58d405027acf5f99a'
-    }
-    */
- 
-    	
-      res.status(200).json(result)
- 
-      /*
-      example of result from the vws API:
-      {
-        "result_code":"Success",
-      "transaction_id":"550e8400e29b41d4a716446655482752"
-      }
-      */
+    resultObj.status =0
+    resultObj.message = "Successfully Updated" 
+    res.status(200).json(resultObj)
     
   })
 }
