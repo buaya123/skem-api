@@ -15,6 +15,7 @@ const dateTime = require('date-and-time')
 app.use(express.json({limit:'50mb'}));
 app.use(express.urlencoded({ limit: "50mb", extended: true, parameterLimit: 50000 }));
 
+const now = new Date();
 
 var client = vuforia.client({
   // Server access key (used for Vuforia Web Services API)
@@ -59,7 +60,7 @@ const createTarget = (req, res) => {
   var width = req.body.width
   var image = req.body.image
   var author = req.body.author
-  const now = new Date();
+  
 
   var target = {
  
