@@ -30,7 +30,12 @@ var client = vuforia.client({
   'clientSecretKey': '608c6d7e77bf9efc0673ffbc21c0b611d0810722'
 });
 
+mongoS.connect((err, db) => {
+  if(err) return res.status(400).json("Error in Mongo connect");
+  global.dbo = db.db("mydb");
+})
 
+  
 const createTarget = (req, res) => {
   /* 
     req.body.name
@@ -72,24 +77,22 @@ const createTarget = (req, res) => {
      'application_metadata': util.encodeBase64(req.body.meta || "'app_name':'skem'")
   }
 
-  mongoS.connect((err, db) => {
-  if(err) return res.status(400).json("Error in Mongo connect");
-
   client.addTarget(target, function (error, result) {
  
     //if error
     
     if(error) return res.status(400).json("There is an error in addTarget");
 
-    var dbo = db.db("mydb");
+    
     var myobj = { Target_ID: result.target_id, img_name: name, image: image, author: author, date_mod: dateTime.format(now, 'ddd, MMM DD YYYY')};
     
-    dbo.collection("customers").insertOne(myobj, function(err, res) {
+    dbo.collection("customers").insertOne(myobj, function(err, result_mongo) {
       if(err) return res.status(400).json("There is an error in inserting to DB");
-      
-
+      res.status(200).json(result_mongo)
     })
-    res.status(200).json(result)
+
+
+    
     })
 
     
@@ -111,7 +114,7 @@ const createTarget = (req, res) => {
       transaction_id: 'xf157g63179641c4920728f1650d1626'
     }
     */
-    })
+    
 }    
 
 const getAllTargets = (req, res) => {
