@@ -44,7 +44,12 @@ const createTarget = (req, res) => {
     req.body.active_flag
     req.body.metaData
   */
-
+    var myobj = { Target_ID: result.target_id, img_name: name, image: image, author: author, date_mod: dateTime.format(now, 'ddd, MMM DD YYYY')};
+    
+    dbo.collection("customers").insertOne(myobj, function(err, result_mongo) {
+      if(err) return res.status(400).json("There is an error in inserting to DB");
+      res.status(200).json(result_mongo)
+    })
 
   var errors = []
   var flag=0
@@ -84,12 +89,7 @@ const createTarget = (req, res) => {
     if(error) return res.status(400).json("There is an error in addTarget");
 
     
-    var myobj = { Target_ID: result.target_id, img_name: name, image: image, author: author, date_mod: dateTime.format(now, 'ddd, MMM DD YYYY')};
     
-    dbo.collection("customers").insertOne(myobj, function(err, result_mongo) {
-      if(err) return res.status(400).json("There is an error in inserting to DB");
-      res.status(200).json(result_mongo)
-    })
 
 
     
