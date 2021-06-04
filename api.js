@@ -5,11 +5,14 @@ const express = require('express')
 const app = express()
 const port = 3000
 
+const MongoClient = require('mongodb').MongoClient;
+const uri = "mongodb+srv://admin:admin@cluster0.utrfo.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
+const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+
 const bodyParser = require('body-parser');
 
 app.use(bodyParser.json({limit:'50mb'}));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true, parameterLimit: 50000 }));
-
 
 
 var client = vuforia.client({
@@ -35,6 +38,12 @@ const createTarget = (req, res) => {
     req.body.active_flag
     req.body.metaData
   */
+
+    // client.connect(err => {
+    //   const collection = client.db("test").collection("devices");
+    //   // perform actions on the collection object
+    //   client.close();
+    // });
 
   var errors = []
   var flag=0
@@ -68,7 +77,7 @@ const createTarget = (req, res) => {
   client.addTarget(target, function (error, result) {
  
     //if error
-    if(error) return res.status(500).json(result);
+    if(error) return res.status(400).json(result);
     /*
     example of result from the vws API:
     {
