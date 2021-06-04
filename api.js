@@ -5,9 +5,9 @@ const express = require('express')
 const app = express()
 const port = 3000
 
-const MongoClient = require('mongodb').MongoClient;
-const uri = "mongodb+srv://admin:admin@cluster0.utrfo.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
-const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+// const MongoClient = require('mongodb').MongoClient;
+// const uri = "mongodb+srv://admin:admin@cluster0.utrfo.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
+// const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
 const bodyParser = require('body-parser');
 
