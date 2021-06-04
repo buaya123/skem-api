@@ -52,7 +52,7 @@ const createTarget = (req, res) => {
   if(typeof req.body.width === 'object' || typeof req.body.width === 'undefined' || typeof req.body.width === 'number') {errors.push("Width is invalid"); flag=1}
   if(typeof req.body.image === 'object' || typeof req.body.image === 'undefined' ) {errors.push("Image is invalid"); flag = 1}
 
-  if(flag == 1) return res.status(500).json(errors)
+  if(flag == 1) return res.status(400).json(errors)
 
   var name = req.body.name
   var width = req.body.width
