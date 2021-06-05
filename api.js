@@ -248,18 +248,19 @@ const deleteTarget = (req, res) => {
     if(err) return res.status(400).json(returnObj);
 
   client.deleteTarget(oneTarget, function (error, result) {
-    if (error) return res.status(400).json(result)
+    returnObj.message = "Could not find Target_ID"
+    if (error) return res.status(400).json(returnObj)
     var dbo = db.db("mydb");
       var myquery = { Target_ID: oneTarget};
 
     dbo.collection("customers").deleteOne(myquery, function(err, obj) {
-      returnObj.message = "Error in MongoDB insert"
-    if (err) return res.status(400).json(returnObj)
-    returnObj.status = 0;
-    returnObj.message = "Successfully deleted"
+      
+      if (err) return res.status(400).json(returnObj)
+      returnObj.status = 0;
+      returnObj.message = "Successfully deleted"
 
-    return res.status(200).json(returnObj)
-  })
+      return res.status(200).json(returnObj)
+    })
   })  
 })
 }
