@@ -103,43 +103,77 @@ const createTarget = (req, res) => {
   })
 }    
 
-const getAllTargets = (req, res) => {
-
+const getAllTargets = async (req, res) => {
+  var data = []
+  var data2 = []
   var returnObj ={
     status:1,
     message:"There was an error connecting to vuforia"
+  }
+  var tempObj = {
+    name:"",
+    image:"",
+    description:"",
+    author:"",
+    date_mod:""
   }
 
   //connecting to vuforia
   client.listTargets(function (error, result) {
 
     if (error) return res.status(400).json(returnObj);
+
+    mongoS.connect( async (err, db) => {
+      returnObj.message = "Error in Mongo connect"
+      if(err) return res.status(400).json(returnObj);
+      var dbo = db.db("mydb");
     
-    returnObj.status = 0
-    returnObj.message = result
-    res.status(200).json(returnObj)
+      result.results.forEach(element => {
+        data.push({"Target_ID":element})
+      });
+
+      
+      var found = await dbo.collection("customers").find({$or:data}).toArray();
+      //console.log(found)
+      found.forEach(qwe =>{
+        data2.push(qwe)
+      })  
+      
+      returnObj.status=0
+      returnObj.message = data2
+      return res.status(200).json(returnObj)
+    })
 
   })             
 }
 
-const getOneTarget = (req, res) => {
+const getOneTarget =async (req, res) => {
   //console.log(req.body.target)
+  var data = []
   var returnObj = {
     status: 1,
-    message: "Invalid Target Id"
+    message: "Error in Mongo connect"
   }
 
   const oneTarget = req.body.target
 
-  client.retrieveTarget(oneTarget, function (error, result) {
- 
-    if (error) return res.status(500).json(returnObj);
- 
+  mongoS.connect( async (err, db) => {
+    if(err) return res.status(400).json(returnObj);
+
+    var dbo = db.db("mydb");
+    var found = await dbo.collection("customers").find({"Target_ID":oneTarget}).toArray();
+
+    found.forEach(qwe =>{
+      data.push(qwe)
+    })  
+
+    returnObj.message="Invalid Target Id"
+    if(data.length == 0 ) return res.status(500).json(returnObj)
+    
     returnObj.status = 0
-    returnObj.message = result
+    returnObj.message = data
     res.status(200).json(returnObj)
- 
-  })      
+  })
 } 
 
 const updateTarget = (req, res) => {
