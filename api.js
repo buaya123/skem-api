@@ -173,45 +173,61 @@ const updateTarget = (req, res) => {
     'active_flag' : true,
     'application_metadata' : util.encodeBase64(req.body.metaData || "'app_name':'skem'")
   };
+
+  mongoS.connect((err, db) => {
+    returnObj.message = "Error in Mongo connect"
+    if(err) return res.status(400).json(returnObj);
  
   client.updateTarget(oneTarget, update, function (error, result) {
     resultObj.status = 2
     resultObj.message = "Invalid target_ID"
 
     if (error) return res.status(400).json(resultObj)
- 
-    resultObj.status =0
-    resultObj.message = "Successfully Updated" 
-    res.status(200).json(resultObj)
-    
+
+    //initializing variables
+    dbo = db.db("mydb");
+    var myobj = { Target_ID: result.target_id, img_name: name, image: image, author: author, date_mod: dateTime.format(now, 'ddd, MMM DD YYYY')};
+  
+    dbo.collection("customers").updateOne(myobj, (err, result_mongo) => {
+      //if err
+      returnObj.message ="There is an error in inserting to mongoDB"
+      if(err) return res.status(400).json(returnObj);
+      
+
+      returnObj.status = 0
+      returnObj.message = "Successfully updated in database"
+      res.status(200).json(returnObj)
+    })
+    })
   })
 }
 
 const deleteTarget = (req, res) => {
+  var returnObj = {
+    status:1,
+    message:""
+  }
   const oneTarget = req.body.target
 
-  client.deleteTarget(oneTarget, function (error, result) {
+  mongoS.connect((err, db) => {
+    returnObj.message = "Error in Mongo connect"
+    if(err) return res.status(400).json(returnObj);
 
+  client.deleteTarget(oneTarget, function (error, result) {
     if (error) return res.status(400).json(result)
- 
-        /*
-        example of result from the vws API:
-        {
-        	result_code: 'AuthenticationFailure',
-        	transaction_id: '58b51ddc7a2c4ac58d405027acf5f99a'
-        }
-        */
- 
-    console.log(result);
-    res.status(200).json(result)
-      /*
-      example of result from the vws API:
-      {
-        “result_code”:”Success”,
-        “transaction_id”:”550e8400e29b41d4a716446655482752”
-      }
-      */
+    var dbo = db.db("mydb");
+      var myquery = { Target_ID: oneTarget};
+
+    dbo.collection("customers").deleteOne(myquery, function(err, obj) {
+      returnObj.message = "Error in MongoDB insert"
+    if (err) return res.status(400).json(returnObj)
+    returnObj.status = 0;
+    returnObj.message = "Successfully deleted"
+
+    return res.status(200).json(returnObj)
+  })
   })  
+})
 }
 
 module.exports ={
