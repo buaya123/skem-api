@@ -44,14 +44,13 @@ const createTarget = (req, res) => {
   var regexp = /^[a-zA-Z0-9-_]+$/;
 
   if(regexp.test(req.body.name) == false && req.body.name.length < 3) {errors.push("Name is invalid"); flag = 1}
-  if(isNaN(req.body.width)) {errors.push("Width is invalid"); flag=1}
   if(typeof req.body.image != "string") {errors.push("Image is invalid"); flag = 1}
   
   returnObj.message = errors
   if(flag == 1) return res.status(400).json(returnObj)
 
   var name = req.body.name
-  var width = req.body.width
+  var width = 300
   var image = req.body.image
   var author = req.body.author
   
@@ -81,7 +80,7 @@ const createTarget = (req, res) => {
     client.addTarget(target, function (error, result) {
   
       //if error
-      returnObj.message ="There is an error in adding a Target to Vuforia"
+      returnObj.message ="There is an error in adding a Target to Vuforia: " + error
       if(error) return res.status(400).json(returnObj);
 
       //initializing variables
@@ -214,7 +213,7 @@ const updateTarget = (req, res) => {
  
   client.updateTarget(oneTarget, update, function (error, result) {
     resultObj.status = 2
-    resultObj.message = "Invalid target_ID"
+    resultObj.message = "There was an error updating a target in Vuforia: "+error
 
     if (error) return res.status(400).json(resultObj)
 
