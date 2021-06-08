@@ -10,6 +10,7 @@ app.use(express.urlencoded({ limit: "50mb", extended: true, parameterLimit: 5000
 app.all('*', (req, res, next) => {
     console.log(`${new Date()} - request for ${req.path}`);
     res.set('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH,OPTIONS');
     next();
 });
 
