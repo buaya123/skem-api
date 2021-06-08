@@ -45,7 +45,6 @@ const createTarget = (req, res) => {
 
   if(regexp.test(req.body.name) == false && req.body.name.length < 3) {errors.push("Name is invalid"); flag = 1}
  
-  
   returnObj.message = errors
   if(flag == 1) return res.status(400).json(returnObj)
 
@@ -85,7 +84,7 @@ const createTarget = (req, res) => {
 
       //initializing variables
       dbo = db.db("mydb");
-      var myobj = { Target_ID: result.target_id, img_name: name, image: image, author: author, date_mod: dateTime.format(now, 'ddd, MMM DD YYYY')};
+      var myobj = { Target_ID: result.target_id, img_name: name, image: "https://picsum.photos/300/300", author: author, date_mod: dateTime.format(now, 'ddd, MMM DD YYYY')};
     
       dbo.collection("customers").insertOne(myobj, (err, result_mongo) => {
         //if err
