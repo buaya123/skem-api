@@ -44,7 +44,7 @@ const createTarget = (req, res) => {
   var regexp = /^[a-zA-Z0-9-_]+$/;
 
   if(regexp.test(req.body.name) == false && req.body.name.length < 3) {errors.push("Name is invalid"); flag = 1}
-  if(typeof req.body.image != "string") {errors.push("Image is invalid"); flag = 1}
+ 
   
   returnObj.message = errors
   if(flag == 1) return res.status(400).json(returnObj)
@@ -109,37 +109,28 @@ const getAllTargets = async (req, res) => {
     status:1,
     message:"There was an error connecting to vuforia"
   }
-  var tempObj = {
-    name:"",
-    image:"",
-    description:"",
-    author:"",
-    date_mod:""
-  }
 
   //connecting to vuforia
   client.listTargets(function (error, result) {
 
     if (error) return res.status(400).json(returnObj);
-
+    
     mongoS.connect( async (err, db) => {
+      
       returnObj.message = "Error in Mongo connect"
       if(err) return res.status(400).json(returnObj);
       var dbo = db.db("mydb");
     
       result.results.forEach(element => {
         data.push({"Target_ID":element})
-      });
-
+      })
       
       var found = await dbo.collection("customers").find({$or:data}).toArray();
       //console.log(found)
-      found.forEach(qwe =>{
-        data2.push(qwe)
-      })  
+      
       
       returnObj.status=0
-      returnObj.message = data2
+      returnObj.message = found
       return res.status(200).json(returnObj)
     })
 
