@@ -2,6 +2,9 @@ const express = require('express')
 const app = express()
 const port = 3000
 const api = require('./api.js')
+var cors = require('cors')
+
+app.use(cors()) // Use this after the variable declaration
 
 app.use(express.json({limit:'50mb'}));
 app.use(express.urlencoded({ limit: "50mb", extended: true, parameterLimit: 50000 }));
