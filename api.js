@@ -262,24 +262,25 @@ const loginAccount = async (req, res) => {
     message:"There was an error connecting to vuforia"
   }
 
+  const oneTarget = req.body.username
+
   mongoS.connect( async (err, db) => {
-      
-    returnObj.message = "Error in Mongo connect"
     if(err) return res.status(400).json(returnObj);
+
     var dbo = db.db("mydb");
-  
-    result.results.forEach(element => {
-      data.push({"Target_ID":element})
-    })
+    var found = await dbo.collection("account").find({"username":oneTarget}).toArray();
+
+    found.forEach(qwe =>{
+      data.push(qwe)
+    })  
+
+    returnObj.message="Invalid Target Id"
+    if(data.length == 0 ) return res.status(500).json(returnObj)
     
-    var found = await dbo.collection("accounts").findOne({ username: req.body.username}).toArray();
-    //console.log(found)
-    
-    
-    returnObj.status=0
-    returnObj.message = found
-    return res.status(200).json(returnObj)
-  })             
+    returnObj.status = 0
+    returnObj.message = data
+    res.status(200).json(returnObj)
+  })          
 }
 
 module.exports ={
