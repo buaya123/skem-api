@@ -268,7 +268,7 @@ const loginAccount = async (req, res) => {
     if(err) return res.status(400).json(returnObj);
 
     var dbo = db.db("mydb");
-    var found = await dbo.collection("account").find({"username":oneTarget}).toArray();
+    var found = await dbo.collection("accounts").find({"username":oneTarget}).toArray();
 
     found.forEach(qwe =>{
       data.push(qwe)
