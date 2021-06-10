@@ -254,10 +254,39 @@ const deleteTarget = (req, res) => {
 })
 }
 
+const loginAccount = async (req, res) => {
+  var data = []
+  var data2 = []
+  var returnObj ={
+    status:1,
+    message:"There was an error connecting to vuforia"
+  }
+
+  mongoS.connect( async (err, db) => {
+      
+    returnObj.message = "Error in Mongo connect"
+    if(err) return res.status(400).json(returnObj);
+    var dbo = db.db("mydb");
+  
+    result.results.forEach(element => {
+      data.push({"Target_ID":element})
+    })
+    
+    var found = await dbo.collection("accounts").findOne({ username: req.body.username}).toArray();
+    //console.log(found)
+    
+    
+    returnObj.status=0
+    returnObj.message = found
+    return res.status(200).json(returnObj)
+  })             
+}
+
 module.exports ={
   createTarget,
   getAllTargets,
   getOneTarget,
   updateTarget,
-  deleteTarget
+  deleteTarget,
+  loginAccount
 }
