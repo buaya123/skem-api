@@ -262,19 +262,17 @@ const loginAccount = async (req, res) => {
     message:"There was an error connecting to vuforia"
   }
 
-  const oneTarget = req.body.username
-
   mongoS.connect( async (err, db) => {
     if(err) return res.status(400).json(returnObj);
 
     var dbo = db.db("mydb");
-    var found = await dbo.collection("accounts").find({"username":oneTarget}).toArray();
+    var found = await dbo.collection("accounts").find({"username":req.body.username, "password":req.body.password}).toArray();
 
     found.forEach(qwe =>{
       data.push(qwe)
     })  
 
-    returnObj.message="Invalid Target Id"
+    returnObj.message="Invalid Username/Password"
     if(data.length == 0 ) return res.status(500).json(returnObj)
     
     returnObj.status = 0
