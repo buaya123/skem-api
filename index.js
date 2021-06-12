@@ -35,5 +35,7 @@ app.post('/api/updateTarget', api.updateTarget)
 
 app.post('/api/deleteTarget', api.deleteTarget)
 
+app.post('/api/loginAccount', api.loginAccount)
+
 
 
