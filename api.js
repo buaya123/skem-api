@@ -269,27 +269,28 @@ const loginAccount = async (req, res) => {
       errors.push("Username/Password is invalid");
       returnObj.message = errors
       return res.status(500).json(returnObj)
-    }
+    } else if (isEmpty(errors)){
+      mongoS.connect( async (err, db) => {
 
-  mongoS.connect( async (err, db) => {
-
-    if(err) return res.status(400).json(returnObj);
-
-    var dbo = db.db("mydb");
-    var found = await dbo.collection("accounts").find({"username":req.body.username, "password":req.body.password}).toArray();
-
-    found.forEach(qwe =>{
-      data.push(qwe)
-    })  
-    console.log("HEre lies things 1111111");
-    returnObj.message="Username not found"
-    if(data.length == 0 ) return res.status(500).json(returnObj)
-    console.log("HEre lies things");
+        if(err) return res.status(400).json(returnObj);
     
-    returnObj.status = 0
-    returnObj.message = data
-    res.status(200).json(returnObj)
-  })          
+        var dbo = db.db("mydb");
+        var found = await dbo.collection("accounts").find({"username":req.body.username, "password":req.body.password}).toArray();
+    
+        found.forEach(qwe =>{
+          data.push(qwe)
+        })  
+        console.log("HEre lies things 1111111");
+        returnObj.message="Username not found"
+        if(data.length == 0 ) return res.status(500).json(returnObj)
+        console.log("HEre lies things");
+        
+        returnObj.status = 0
+        returnObj.message = data
+        res.status(200).json(returnObj)
+      }) 
+    }
+         
 }
 
 module.exports ={
