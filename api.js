@@ -281,9 +281,10 @@ const loginAccount = async (req, res) => {
     found.forEach(qwe =>{
       data.push(qwe)
     })  
-
-    returnObj.message="Invalid Username/Password"
+    console.log("HEre lies things 1111111");
+    returnObj.message="Username not found"
     if(data.length == 0 ) return res.status(500).json(returnObj)
+    console.log("HEre lies things");
     
     returnObj.status = 0
     returnObj.message = data
