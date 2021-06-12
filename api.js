@@ -265,19 +265,11 @@ const loginAccount = async (req, res) => {
     var flag=0
     var regexp = /^[a-zA-Z0-9-_]+$/;
 
-    if(regexp.test(req.body.name) == false && req.body.name.length < 3) {
-      errors.push("Name is invalid"); flag = 1
+    if(regexp.test(req.body.username) == false && regexp.test(req.body.password) == false) {
+      errors.push("Username/Password is invalid");
+      returnObj.message = errors
+      return res.status(500).json(returnObj)
     }
-    if(isNaN(req.body.width)) {
-      errors.push("Width is invalid"); 
-      flag=1
-    }
-    if(typeof req.body.image != "string") {
-      errors.push("Image is invalid"); flag = 1
-    }
-
-    returnObj.message = errors
-    if(flag == 1) return res.status(500).json(returnObj)
 
   mongoS.connect( async (err, db) => {
 
