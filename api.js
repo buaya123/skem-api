@@ -256,14 +256,31 @@ const deleteTarget = (req, res) => {
 
 const loginAccount = async (req, res) => {
   var data = []
-  var data2 = []
   var returnObj ={
     status:1,
     message:"There was an error connecting to vuforia"
   }
 
+  var errors = []
+    var flag=0
+    var regexp = /^[a-zA-Z0-9-_]+$/;
+
   mongoS.connect( async (err, db) => {
     if(err) return res.status(400).json(returnObj);
+
+    if(regexp.test(req.body.name) == false && req.body.name.length < 3) {
+      errors.push("Name is invalid"); flag = 1
+    }
+    if(isNaN(req.body.width)) {
+      errors.push("Width is invalid"); 
+      flag=1
+    }
+    if(typeof req.body.image != "string") {
+      errors.push("Image is invalid"); flag = 1
+    }
+
+    returnObj.message = errors
+    if(flag == 1) return res.status(500).json(errors)
 
     var dbo = db.db("mydb");
     var found = await dbo.collection("accounts").find({"username":req.body.username, "password":req.body.password}).toArray();
