@@ -265,9 +265,6 @@ const loginAccount = async (req, res) => {
     var flag=0
     var regexp = /^[a-zA-Z0-9-_]+$/;
 
-  mongoS.connect( async (err, db) => {
-    if(err) return res.status(400).json(returnObj);
-
     if(regexp.test(req.body.name) == false && req.body.name.length < 3) {
       errors.push("Name is invalid"); flag = 1
     }
@@ -280,7 +277,11 @@ const loginAccount = async (req, res) => {
     }
 
     returnObj.message = errors
-    if(flag == 1) return res.status(500).json(errors)
+    if(flag == 1) return res.status(500).json(returnObj)
+
+  mongoS.connect( async (err, db) => {
+
+    if(err) return res.status(400).json(returnObj);
 
     var dbo = db.db("mydb");
     var found = await dbo.collection("accounts").find({"username":req.body.username, "password":req.body.password}).toArray();
