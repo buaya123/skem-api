@@ -1,9 +1,12 @@
 const express = require('express')
 const app = express()
-const port = 3000
+const port = 3002
 const ejs = require('ejs');
 const multer = require('multer');
 const path = require('path');
+var cors = require('cors')
+
+app.use(cors())
 
 // Set The Storage Engine
 const storage = multer.diskStorage({
@@ -11,7 +14,7 @@ const storage = multer.diskStorage({
     filename: function(req, file, cb){
       cb(null,file.originalname);
     }
-  });
+  })
 
   // Init Upload
 const upload = multer({
@@ -73,8 +76,8 @@ app.post('/upload', (req, res) => {
           res.status(200).json(returnObj)
         }
       }
-    });
-  });
+    })
+  })
 
 app.get('/show/:name',(req,res)=>{
     var img_name = req.params.name
