@@ -92,6 +92,7 @@ app.get('/show/:name',(req,res)=>{
 
     console.log("fetching image: ", path);
     res.sendFile(path, { root: __dirname});
+    //res.status(200).json("")
 })
   
 

@@ -53,6 +53,7 @@ const createTarget = (req, res) => {
   var image = req.body.image
   var author = req.body.author
   var filename = req.body.filename
+  var desc = req.body.desc
   
 
   var target = {
@@ -85,7 +86,7 @@ const createTarget = (req, res) => {
 
       //initializing variables
       dbo = db.db("mydb");
-      var myobj = { Target_ID: result.target_id, img_name: name, image: filename, author: author, date_mod: dateTime.format(now, 'ddd, MMM DD YYYY')};
+      var myobj = { Target_ID: result.target_id, img_name: name, image: filename,desc:desc, author: author, date_mod: dateTime.format(now, 'ddd, MMM DD YYYY')};
     
       dbo.collection("customers").insertOne(myobj, (err, result_mongo) => {
         //if err
@@ -177,9 +178,8 @@ const updateTarget = (req, res) => {
     var regexp = /^[a-zA-Z0-9-_]+$/;
 
   if(regexp.test(req.body.name) == false && req.body.name.length < 3) {errors.push("Name is invalid"); flag = 1}
-  if(isNaN(req.body.width)) {errors.push("Width is invalid"); flag=1}
-  if(typeof req.body.image != "string") {errors.push("Image is invalid"); flag = 1}
-  
+    
+    
   returnObj.message = errors
   if(flag == 1) return res.status(500).json(errors)
 
@@ -187,6 +187,7 @@ const updateTarget = (req, res) => {
   var width = req.body.width
   var image = req.body.image
   var author = req.body.author
+  var desc = req.body.desc
 
   const oneTarget = req.body.target
 
@@ -210,7 +211,7 @@ const updateTarget = (req, res) => {
 
     //initializing variables
     dbo = db.db("mydb");
-    var myobj = { Target_ID: result.target_id, img_name: name, image: image, author: author, date_mod: dateTime.format(now, 'ddd, MMM DD YYYY')};
+    var myobj = { Target_ID: result.target_id, img_name: name,desc:desc, author: author, date_mod: dateTime.format(now, 'ddd, MMM DD YYYY')};
   
     dbo.collection("customers").updateOne(myobj, (err, result_mongo) => {
       //if err
