@@ -52,6 +52,7 @@ const createTarget = (req, res) => {
   var width = 300
   var image = req.body.image
   var author = req.body.author
+  var filename = req.body.filename
   
 
   var target = {
@@ -84,7 +85,7 @@ const createTarget = (req, res) => {
 
       //initializing variables
       dbo = db.db("mydb");
-      var myobj = { Target_ID: result.target_id, img_name: name, image: "https://picsum.photos/300/300", author: author, date_mod: dateTime.format(now, 'ddd, MMM DD YYYY')};
+      var myobj = { Target_ID: result.target_id, img_name: name, image: filename, author: author, date_mod: dateTime.format(now, 'ddd, MMM DD YYYY')};
     
       dbo.collection("customers").insertOne(myobj, (err, result_mongo) => {
         //if err
