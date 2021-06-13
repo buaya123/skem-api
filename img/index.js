@@ -7,26 +7,28 @@ const path = require('path')
 var cors = require('cors')
 
 app.use(cors())
-
+var filee 
 // Set The Storage Engine
 const storage = multer.diskStorage({
     destination: './public/uploads/',
     filename: function(req, file, cb){
       //cb(null,file.originalname);
-      cb(null,file.fieldname+path.extname(file.originalname));
+      cb(null,file.originalname);
+      
     }
   })
+  
 
   // Init Upload
-  var filee = ""
+  
 const upload = multer({
     storage: storage,
     limits:{fileSize: 1000000},
     fileFilter: function(req, file, cb){
-      filee=file
       checkFileType(file, cb);
-    }
-  }).single(filee.fieldname);
+    },
+    
+  }).single("myImage")
 
 
 // EJS
@@ -58,6 +60,7 @@ app.post('/upload', (req, res) => {
     msg:"Error uploading image"
   }
     upload(req, res, (err) => {
+      
       //console.log(req.file)
       if(err){
         // res.render('index', {
