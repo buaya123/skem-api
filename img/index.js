@@ -1,9 +1,9 @@
 const express = require('express')
 const app = express()
 const port = 3002
-const ejs = require('ejs');
-const multer = require('multer');
-const path = require('path');
+const ejs = require('ejs')
+const multer = require('multer')
+const path = require('path')
 var cors = require('cors')
 
 app.use(cors())
@@ -12,7 +12,8 @@ app.use(cors())
 const storage = multer.diskStorage({
     destination: './public/uploads/',
     filename: function(req, file, cb){
-      cb(null,file.originalname);
+      //cb(null,file.originalname);
+      cb(null,file.fieldname+path.extname(file.originalname));
     }
   })
 
@@ -55,6 +56,7 @@ app.post('/upload', (req, res) => {
     msg:"Error uploading image"
   }
     upload(req, res, (err) => {
+      //console.log(req.file)
       if(err){
         // res.render('index', {
         //   msg: err
