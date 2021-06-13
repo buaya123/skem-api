@@ -24,7 +24,7 @@ const upload = multer({
     fileFilter: function(req, file, cb){
       checkFileType(file, cb);
     }
-  }).single('myImage');
+  }).single(file.fieldname);
 
 
 // EJS
