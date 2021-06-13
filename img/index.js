@@ -88,7 +88,7 @@ app.post('/upload', (req, res) => {
 
 app.get('/show/:name',(req,res)=>{
     var img_name = req.params.name
-    var path = "./public/uploads/"+img_name+".jpg";
+    var path = "./public/uploads/"+img_name;
 
     console.log("fetching image: ", path);
     res.sendFile(path, { root: __dirname});
