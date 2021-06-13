@@ -18,13 +18,15 @@ const storage = multer.diskStorage({
   })
 
   // Init Upload
+  var filee = ""
 const upload = multer({
     storage: storage,
     limits:{fileSize: 1000000},
     fileFilter: function(req, file, cb){
+      filee=file
       checkFileType(file, cb);
     }
-  }).single(file.fieldname);
+  }).single(filee.fieldname);
 
 
 // EJS
