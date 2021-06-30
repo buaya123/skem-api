@@ -31,7 +31,7 @@ var client = vuforia.client({
   'clientSecretKey': '608c6d7e77bf9efc0673ffbc21c0b611d0810722'
 });
 
-  
+
 const createTarget = (req, res) => {
 
   //initializing variables
@@ -43,10 +43,13 @@ const createTarget = (req, res) => {
   var flag=0
   var regexp = /^[a-zA-Z0-9-_]+$/;
 
-  if(regexp.test(req.body.name) == false && req.body.name.length < 3) {errors.push("Name is invalid"); flag = 1}
- 
-  returnObj.message = errors
-  if(flag == 1) return res.status(400).json(returnObj)
+  if(regexp.test(req.body.name) == false && req.body.name.length < 3) {
+    errors.push("Name is invalid")
+    returnObj.message = errors
+    return res.status(400).json(returnObj)
+  }
+
+  
 
   var name = req.body.name
   var width = 300
@@ -88,7 +91,7 @@ const createTarget = (req, res) => {
       dbo = db.db("mydb");
       var myobj = { Target_ID: result.target_id, img_name: name, image: filename,desc:desc, author: author, date_mod: dateTime.format(now, 'ddd, MMM DD YYYY')};
     
-      dbo.collection("customers").insertOne(myobj, (err, result_mongo) => {
+      dbo.collection("targets").insertOne(myobj, (err, result_mongo) => {
         //if err
         returnObj.message ="There is an error in inserting to mongoDB"
         if(err) return res.status(400).json(returnObj);
@@ -125,8 +128,9 @@ const getAllTargets = async (req, res) => {
       result.results.forEach(element => {
         data.push({"Target_ID":element})
       })
-      
-      var found = await dbo.collection("customers").find({$or:data}).toArray();
+    
+
+      var found = await dbo.collection("targets").find({$or:data}).toArray();
       //console.log(found)
       
       
@@ -152,7 +156,7 @@ const getOneTarget =async (req, res) => {
     if(err) return res.status(400).json(returnObj);
 
     var dbo = db.db("mydb");
-    var found = await dbo.collection("customers").find({"Target_ID":oneTarget}).toArray();
+    var found = await dbo.collection("targets").find({"Target_ID":oneTarget}).toArray();
 
     found.forEach(qwe =>{
       data.push(qwe)
@@ -167,6 +171,7 @@ const getOneTarget =async (req, res) => {
   })
 } 
 
+//updating Target
 const updateTarget = (req, res) => {
 
     var errors = []
@@ -213,7 +218,7 @@ const updateTarget = (req, res) => {
     dbo = db.db("mydb");
     var myobj = { Target_ID: result.target_id, img_name: name,desc:desc, author: author, date_mod: dateTime.format(now, 'ddd, MMM DD YYYY')};
   
-    dbo.collection("customers").updateOne(myobj, (err, result_mongo) => {
+    dbo.collection("targets").updateOne(myobj, (err, result_mongo) => {
       //if err
       returnObj.message ="There is an error in inserting to mongoDB"
       if(err) return res.status(400).json(returnObj);
@@ -244,7 +249,7 @@ const deleteTarget = (req, res) => {
     var dbo = db.db("mydb");
       var myquery = { Target_ID: oneTarget};
 
-    dbo.collection("customers").deleteOne(myquery, function(err, obj) {
+    dbo.collection("targets").deleteOne(myquery, function(err, obj) {
       
       if (err) return res.status(400).json(returnObj)
       returnObj.status = 0;
