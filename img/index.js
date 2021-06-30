@@ -41,7 +41,7 @@ app.get('/', (req, res) => res.render('index'));
 
 function checkFileType(file, cb){
     // Allowed ext
-    const filetypes = /jpeg|jpg/;
+    const filetypes = /jpeg|jpg|png/;
     // Check ext
     const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
     // Check mime
@@ -50,10 +50,10 @@ function checkFileType(file, cb){
     if(mimetype && extname){
       return cb(null,true);
     } else {
-      cb('Error: .jpg Only!');
+      cb('Error: .jpg and .png Only!');
     }
   }
-
+//localhost:3000/upload
 app.post('/upload', (req, res) => {
   const returnObj = {
     status:1,
@@ -63,21 +63,15 @@ app.post('/upload', (req, res) => {
       
       //console.log(req.file)
       if(err){
-        // res.render('index', {
-        //   msg: err
-        // });
-        res.status(500).json(returnObj)
+
+        return res.status(500).json(returnObj)
       } else {
         if(req.file == undefined){
-          // res.render('index', {
-          //   msg: 'Error: No File Selected!'
-          // });
-          res.status(500).json(returnObj)
+
+          return res.status(500).json(returnObj)
         } else {
-          // res.render('index', {
-          //   msg: 'File Uploaded!',
-          //   file: `uploads/${req.file.filename}`
-          // });
+
+
           returnObj.status = 0
           returnObj.msg = "Successfully uploaded image"
           res.status(200).json(returnObj)
@@ -85,7 +79,7 @@ app.post('/upload', (req, res) => {
       }
     })
   })
-
+//localhost:3000/show/aerol.jpeg
 app.get('/show/:name',(req,res)=>{
     var img_name = req.params.name
     var path = "./public/uploads/"+img_name;
