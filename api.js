@@ -32,7 +32,7 @@ var client = vuforia.client({
   'clientSecretKey': '608c6d7e77bf9efc0673ffbc21c0b611d0810722'
 });
 
-  
+
 const createTarget = (req, res) => {
 
   //initializing variables
@@ -44,17 +44,20 @@ const createTarget = (req, res) => {
   var flag=0
   var regexp = /^[a-zA-Z0-9-_]+$/;
 
-  if(regexp.test(req.body.name) == false && req.body.name.length < 3) {errors.push("Name is invalid"); flag = 1}
-  if(isNaN(req.body.width)) {errors.push("Width is invalid"); flag=1}
-  if(typeof req.body.image != "string") {errors.push("Image is invalid"); flag = 1}
+  if(regexp.test(req.body.name) == false && req.body.name.length < 3) {
+    errors.push("Name is invalid")
+    returnObj.message = errors
+    return res.status(400).json(returnObj)
+  }
+
   
-  returnObj.message = errors
-  if(flag == 1) return res.status(400).json(returnObj)
 
   var name = req.body.name
-  var width = req.body.width
+  var width = 300
   var image = req.body.image
   var author = req.body.author
+  var filename = req.body.filename
+  var desc = req.body.desc
   
 
   var target = {
@@ -82,14 +85,14 @@ const createTarget = (req, res) => {
     client.addTarget(target, function (error, result) {
   
       //if error
-      returnObj.message ="There is an error in adding a Target to Vuforia"
+      returnObj.message ="There is an error in adding a Target to Vuforia: " + error
       if(error) return res.status(400).json(returnObj);
 
       //initializing variables
       dbo = db.db("mydb");
-      var myobj = { Target_ID: result.target_id, img_name: name, image: image, author: author, date_mod: dateTime.format(now, 'ddd, MMM DD YYYY')};
+      var myobj = { Target_ID: result.target_id, img_name: name, image: filename,desc:desc, author: author, date_mod: dateTime.format(now, 'ddd, MMM DD YYYY')};
     
-      dbo.collection("customers").insertOne(myobj, (err, result_mongo) => {
+      dbo.collection("targets").insertOne(myobj, (err, result_mongo) => {
         //if err
         returnObj.message ="There is an error in inserting to mongoDB"
         if(err) return res.status(400).json(returnObj);
@@ -104,8 +107,9 @@ const createTarget = (req, res) => {
   })
 }    
 
-const getAllTargets = (req, res) => {
-
+const getAllTargets = async (req, res) => {
+  var data = []
+  var data2 = []
   var returnObj ={
     status:1,
     message:"There was an error connecting to vuforia"
@@ -116,33 +120,59 @@ const getAllTargets = (req, res) => {
 
     if (error) return res.status(400).json(returnObj);
     
-    returnObj.status = 0
-    returnObj.message = result
-    res.status(200).json(returnObj)
+    mongoS.connect( async (err, db) => {
+      
+      returnObj.message = "Error in Mongo connect"
+      if(err) return res.status(400).json(returnObj);
+      var dbo = db.db("mydb");
+    
+      result.results.forEach(element => {
+        data.push({"Target_ID":element})
+      })
+    
+
+      var found = await dbo.collection("targets").find({$or:data}).toArray();
+      //console.log(found)
+      
+      
+      returnObj.status=0
+      returnObj.message = found
+      return res.status(200).json(returnObj)
+    })
 
   })             
 }
 
-const getOneTarget = (req, res) => {
+const getOneTarget =async (req, res) => {
   //console.log(req.body.target)
+  var data = []
   var returnObj = {
     status: 1,
-    message: "Invalid Target Id"
+    message: "Error in Mongo connect"
   }
 
   const oneTarget = req.body.target
 
-  client.retrieveTarget(oneTarget, function (error, result) {
- 
-    if (error) return res.status(500).json(returnObj);
- 
+  mongoS.connect( async (err, db) => {
+    if(err) return res.status(400).json(returnObj);
+
+    var dbo = db.db("mydb");
+    var found = await dbo.collection("targets").find({"Target_ID":oneTarget}).toArray();
+
+    found.forEach(qwe =>{
+      data.push(qwe)
+    })  
+
+    returnObj.message="Invalid Target Id"
+    if(data.length == 0 ) return res.status(500).json(returnObj)
+    
     returnObj.status = 0
-    returnObj.message = result
+    returnObj.message = data
     res.status(200).json(returnObj)
- 
-  })      
+  })
 } 
 
+//updating Target
 const updateTarget = (req, res) => {
 
     var errors = []
@@ -154,9 +184,8 @@ const updateTarget = (req, res) => {
     var regexp = /^[a-zA-Z0-9-_]+$/;
 
   if(regexp.test(req.body.name) == false && req.body.name.length < 3) {errors.push("Name is invalid"); flag = 1}
-  if(isNaN(req.body.width)) {errors.push("Width is invalid"); flag=1}
-  if(typeof req.body.image != "string") {errors.push("Image is invalid"); flag = 1}
-  
+    
+    
   returnObj.message = errors
   if(flag == 1) return res.status(500).json(errors)
 
@@ -164,6 +193,7 @@ const updateTarget = (req, res) => {
   var width = req.body.width
   var image = req.body.image
   var author = req.body.author
+  var desc = req.body.desc
 
   const oneTarget = req.body.target
 
@@ -181,15 +211,15 @@ const updateTarget = (req, res) => {
  
   client.updateTarget(oneTarget, update, function (error, result) {
     resultObj.status = 2
-    resultObj.message = "Invalid target_ID"
+    resultObj.message = "There was an error updating a target in Vuforia: "+error
 
     if (error) return res.status(400).json(resultObj)
 
     //initializing variables
     dbo = db.db("mydb");
-    var myobj = { Target_ID: result.target_id, img_name: name, image: image, author: author, date_mod: dateTime.format(now, 'ddd, MMM DD YYYY')};
+    var myobj = { Target_ID: result.target_id, img_name: name,desc:desc, author: author, date_mod: dateTime.format(now, 'ddd, MMM DD YYYY')};
   
-    dbo.collection("customers").updateOne(myobj, (err, result_mongo) => {
+    dbo.collection("targets").updateOne(myobj, (err, result_mongo) => {
       //if err
       returnObj.message ="There is an error in inserting to mongoDB"
       if(err) return res.status(400).json(returnObj);
@@ -215,20 +245,59 @@ const deleteTarget = (req, res) => {
     if(err) return res.status(400).json(returnObj);
 
   client.deleteTarget(oneTarget, function (error, result) {
-    if (error) return res.status(400).json(result)
+    returnObj.message = "Could not find Target_ID"
+    if (error) return res.status(400).json(returnObj)
     var dbo = db.db("mydb");
       var myquery = { Target_ID: oneTarget};
 
-    dbo.collection("customers").deleteOne(myquery, function(err, obj) {
-      returnObj.message = "Error in MongoDB insert"
-    if (err) return res.status(400).json(returnObj)
-    returnObj.status = 0;
-    returnObj.message = "Successfully deleted"
+    dbo.collection("targets").deleteOne(myquery, function(err, obj) {
+      
+      if (err) return res.status(400).json(returnObj)
+      returnObj.status = 0;
+      returnObj.message = "Successfully deleted"
 
-    return res.status(200).json(returnObj)
-  })
+      return res.status(200).json(returnObj)
+    })
   })  
 })
+}
+
+const loginAccount = async (req, res) => {
+  var data = []
+  var returnObj ={
+    status:1,
+    message:"There was an error connecting to vuforia"
+  }
+
+  // var errors = []
+  //   var flag=0
+  //   var regexp = /^[a-zA-Z0-9-_]+$/;
+
+  //   if(regexp.test(req.body.username) == false && regexp.test(req.body.password) == false) {
+  //     errors.push("Username/Password is invalid");
+  //     returnObj.message = errors
+  //     return res.status(500).json(returnObj)
+  //   }
+
+  mongoS.connect( async (err, db) => {
+
+    if(err) return res.status(400).json(returnObj);
+
+    var dbo = db.db("mydb");
+    var found = await dbo.collection("accounts").find({"username":req.body.username, "password":req.body.password}).toArray();
+
+    found.forEach(qwe =>{
+      data.push(qwe)
+    })  
+    console.log("HEre lies things 1111111");
+    returnObj.message="Username not found"
+    if(data.length == 0 ) return res.status(500).json(returnObj)
+    console.log("HEre lies things");
+    
+    returnObj.status = 0
+    returnObj.message = data
+    res.status(200).json(returnObj)
+  })          
 }
 
 module.exports ={
@@ -236,5 +305,6 @@ module.exports ={
   getAllTargets,
   getOneTarget,
   updateTarget,
-  deleteTarget
+  deleteTarget,
+  loginAccount
 }
