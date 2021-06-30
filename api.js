@@ -35,20 +35,20 @@ var client = vuforia.client({
 const createTarget = (req, res) => {
 
   //initializing variables
-  var errors = []
+  
   var returnObj = {
     status:1,
     message:""
   }
-  var flag=0
+
   var regexp = /^[a-zA-Z0-9-_]+$/;
 
-  if(regexp.test(req.body.name) == false && req.body.name.length < 3) {
-    errors.push("Name is invalid")
-    returnObj.message = errors
+  if(regexp.test(req.body.name) == false || req.body.name.length < 3) {
+    
+    returnObj.message = "Invalid Name"
     return res.status(400).json(returnObj)
   }
-
+  
   
 
   var name = req.body.name
@@ -136,7 +136,7 @@ const getAllTargets = async (req, res) => {
       
       returnObj.status=0
       returnObj.message = found
-      return res.status(200).json(returnObj)
+      res.status(200).json(returnObj)
     })
 
   })             
@@ -255,7 +255,7 @@ const deleteTarget = (req, res) => {
       returnObj.status = 0;
       returnObj.message = "Successfully deleted"
 
-      return res.status(200).json(returnObj)
+      res.status(200).json(returnObj)
     })
   })  
 })

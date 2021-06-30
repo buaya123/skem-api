@@ -88,7 +88,7 @@ app.get('/show/:name',(req,res)=>{
     res.sendFile(path, { root: __dirname});
     //res.status(200).json("")
 })
-  
+
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
