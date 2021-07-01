@@ -263,9 +263,6 @@ const deleteTarget = (req, res) => {
     })
   })  
 })
-
-
-  })
     
 }
 
