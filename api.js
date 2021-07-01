@@ -213,7 +213,7 @@ const updateTarget = (req, res) => {
     resultObj.status = 2
     resultObj.message = "There was an error updating a target in Vuforia: "+error
 
-    if (error) return res.status(400).json(resultObj)
+    if (error) return res.status(400).json(returnObj)
 
     //initializing variables
     dbo = db.db("mydb");
