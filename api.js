@@ -175,7 +175,7 @@ const getOneTarget =async (req, res) => {
 //updating Target
 const updateTarget = (req, res) => {
   const oneTarget = req.body.target
-  app.put("https://vws.vuforia.com/targets/"+oneTarget,(req,res)=>{
+  
     var errors = []
     var returnObj = {
       status:1,
@@ -184,14 +184,14 @@ const updateTarget = (req, res) => {
     var flag=0
     var regexp = /^[a-zA-Z0-9-_]+$/;
 
-  if(regexp.test(req.body.name) == false && req.body.name.length < 3) {errors.push("Name is invalid"); flag = 1}
+  if(regexp.test(req.body.image) == false && req.body.image.length < 3) {errors.push("Name is invalid"); flag = 1}
     
     
   returnObj.message = errors
   if(flag == 1) return res.status(500).json(errors)
 
-  var name = req.body.name
-  var width = req.body.width
+  //var name = req.body.name
+  
   var image = req.body.image
   var author = req.body.author
   var desc = req.body.desc
@@ -200,9 +200,7 @@ const updateTarget = (req, res) => {
   console.log("image"+image)
 
   var update = {
-    'name': name,
-    'width': parseFloat(width),
-    'image': image,
+    'name': image,
     'active_flag' : true,
     'application_metadata' : util.encodeBase64(req.body.metaData || "'app_name':'skem'")
   };
@@ -219,7 +217,7 @@ const updateTarget = (req, res) => {
 
     //initializing variables
     dbo = db.db("mydb");
-    var myobj = { Target_ID: result.target_id, img_name: name,desc:desc, author: author, date_mod: dateTime.format(now, 'ddd, MMM DD YYYY')};
+    var myobj = { Target_ID: result.target_id, img_name: image,desc:desc, author: author, date_mod: dateTime.format(now, 'ddd, MMM DD YYYY')};
   
     dbo.collection("targets").updateOne(myobj, (err, result_mongo) => {
       //if err
@@ -233,7 +231,7 @@ const updateTarget = (req, res) => {
     })
     })
   })
-})
+
 }
 
 const deleteTarget = (req, res) => {
