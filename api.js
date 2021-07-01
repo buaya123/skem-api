@@ -196,6 +196,7 @@ const updateTarget = (req, res) => {
   var desc = req.body.desc
 
   const oneTarget = req.body.target
+  console.log(image)
 
   var update = {
     'name': name,
