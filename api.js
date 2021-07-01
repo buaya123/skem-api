@@ -45,7 +45,7 @@ const createTarget = (req, res) => {
   var regexp = /^[a-zA-Z0-9-_]+$/;
 
   const model = req.body.name.split('-');
-  const modelNo = parseInt(model[1]);
+  const modelNo = model[1];
 
 
   if(regexp.test(req.body.name) == false || req.body.name.length < 3 || modelNo[1] > 7) {
