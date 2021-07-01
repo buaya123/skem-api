@@ -31,7 +31,7 @@ app.get('/api/getAllTargets', api.getAllTargets)
 
 app.post('/api/getOneTarget', api.getOneTarget)
 
-app.put('/api/updateTarget', api.updateTarget)
+app.post('/api/updateTarget', api.updateTarget)
 
 app.post('/api/deleteTarget', api.deleteTarget)
 

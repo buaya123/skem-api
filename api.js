@@ -174,7 +174,8 @@ const getOneTarget =async (req, res) => {
 
 //updating Target
 const updateTarget = (req, res) => {
-
+  const oneTarget = req.body.target
+  app.put("https://vws.vuforia.com/targets/"+oneTarget,(req,res)=>{
     var errors = []
     var returnObj = {
       status:1,
@@ -195,7 +196,7 @@ const updateTarget = (req, res) => {
   var author = req.body.author
   var desc = req.body.desc
 
-  const oneTarget = req.body.target
+  
   console.log("image"+image)
 
   var update = {
@@ -232,6 +233,7 @@ const updateTarget = (req, res) => {
     })
     })
   })
+})
 }
 
 const deleteTarget = (req, res) => {
@@ -261,6 +263,10 @@ const deleteTarget = (req, res) => {
     })
   })  
 })
+
+
+  })
+    
 }
 
 const loginAccount = async (req, res) => {
