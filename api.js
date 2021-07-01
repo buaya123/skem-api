@@ -210,8 +210,8 @@ const updateTarget = (req, res) => {
     if(err) return res.status(400).json(returnObj);
  
   client.updateTarget(oneTarget, update, function (error, result) {
-    resultObj.status = 2
-    resultObj.message = "There was an error updating a target in Vuforia: "+error
+    returnObj.status = 2
+    returnObj.message = "There was an error updating a target in Vuforia: "+error
 
     if (error) return res.status(400).json(returnObj)
 
